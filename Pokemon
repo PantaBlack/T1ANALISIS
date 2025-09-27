@@ -1,0 +1,107 @@
+import random
+
+class Entrenador:
+    def __init__(self, NombreEntrenador):
+        self.NombreEntrenador = NombreEntrenador
+
+class Pokemon:
+    def __init__(self, NombrePokemon):
+        self.NombrePokemon = NombrePokemon
+        self.AtaqueMaximo = random.randint(20, 100)
+        self.VidaMaxima = random.randint(150, 400)
+        self.VidaActual = self.VidaMaxima
+
+EntrenadorJugador = None
+PokemonJugador = None
+EntrenadorRival = None
+PokemonRival = None
+PeleasGanadas = 0
+PeleasPerdidas = 0
+
+def crearEntrenadorPokemon(numero):
+    global EntrenadorJugador, PokemonJugador, EntrenadorRival, PokemonRival
+    if numero == 1:
+        NombreEntrenador = input("Nombre de su entrenador: ")
+        NombrePokemon = input("Nombre de su Pokemon: ")
+        EntrenadorJugador = Entrenador(NombreEntrenador)
+        PokemonJugador = Pokemon(NombrePokemon)
+        print("Tu Pokemon:", PokemonJugador.NombrePokemon, "ATK", PokemonJugador.AtaqueMaximo, "HP", PokemonJugador.VidaMaxima)
+    else:
+        NombreEntrenador = input("Nombre del entrenador rival: ")
+        NombrePokemon = input("Nombre del Pokemon rival: ")
+        EntrenadorRival = Entrenador(NombreEntrenador)
+        PokemonRival = Pokemon(NombrePokemon)
+        print("Pokemon rival:", PokemonRival.NombrePokemon, "ATK", PokemonRival.AtaqueMaximo, "HP", PokemonRival.VidaMaxima)
+
+def valorDeAtaque(numero):
+    if numero == 1:
+        return random.randint(0, PokemonJugador.AtaqueMaximo)
+    else:
+        return random.randint(0, PokemonRival.AtaqueMaximo)
+
+def defender(defensor, valorAtaque):
+    dado = random.randint(1, 6)
+    if dado == 6:
+        valorAtaque = 0
+
+    if defensor == 1:
+        PokemonJugador.VidaActual -= valorAtaque
+        print(PokemonJugador.NombrePokemon, "tiene", max(PokemonJugador.VidaActual, 0), "de vida")
+        return PokemonJugador.VidaActual
+    else:
+        PokemonRival.VidaActual -= valorAtaque
+        print(PokemonRival.NombrePokemon, "tiene", max(PokemonRival.VidaActual, 0), "de vida")
+        return PokemonRival.VidaActual
+
+def recuperar():
+    if PokemonJugador is not None:
+        PokemonJugador.VidaActual = PokemonJugador.VidaMaxima
+    if PokemonRival is not None:
+        PokemonRival.VidaActual = PokemonRival.VidaMaxima
+
+def main():
+    global PeleasGanadas, PeleasPerdidas
+    print("Pelea Pokemon")
+    crearEntrenadorPokemon(1)
+
+    while True:
+        print("\nMenú: P=Pelear, F=Finalizar")
+        opcion = input("Opción: ").strip().upper()
+
+        if opcion == "F":
+            print("\nResumen:")
+            print("Entrenador:", EntrenadorJugador.NombreEntrenador)
+            print("Pokemon:", PokemonJugador.NombrePokemon, "ATK", PokemonJugador.AtaqueMaximo, "HP", PokemonJugador.VidaMaxima)
+            print("Ganadas:", PeleasGanadas, "Perdidas:", PeleasPerdidas)
+            break
+
+        if opcion != "P":
+            print("Opción inválida")
+            continue
+
+        crearEntrenadorPokemon(2)
+        recuperar()
+
+        turno = 1
+        while True:
+            if turno == 1:
+                ataque = valorDeAtaque(1)
+                print(PokemonJugador.NombrePokemon, "atacó a", PokemonRival.NombrePokemon, "con", ataque, "de ataque")
+                vida = defender(2, ataque)
+                if vida <= 0:
+                    print("Ganaste")
+                    PeleasGanadas += 1
+                    break
+                turno = 2
+            else:
+                ataque = valorDeAtaque(2)
+                print(PokemonRival.NombrePokemon, "atacó a", PokemonJugador.NombrePokemon, "con", ataque, "de ataque")
+                vida = defender(1, ataque)
+                if vida <= 0:
+                    print("Perdiste")
+                    PeleasPerdidas += 1
+                    break
+                turno = 1
+
+if __name__ == "__main__":
+    main()
